@@ -25,6 +25,8 @@ import com.siemens.ct.exi.grammars.SchemaInformedGrammars;
 import com.siemens.ct.exi.grammars.XSDGrammarsBuilder;
 import com.siemens.ct.exi.helpers.DefaultEXIFactory;
 
+import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
+
 public class Grammars2XTest extends TestCase {
 	
 	XSDGrammarsBuilder grammarBuilder = XSDGrammarsBuilder.newInstance();
@@ -75,7 +77,7 @@ public class Grammars2XTest extends TestCase {
 	@Test
 	public void testNotebook() throws Exception {
 		String xsd = "data/W3C/PrimerNotebook/notebook.xsd";
-		String xml = "data/W3C/PrimerNotebook/notebook.xsd";
+		String xml = "data/W3C/PrimerNotebook/notebook.xml";
 		_test(xsd, xml);
 	}
 	
@@ -93,4 +95,31 @@ public class Grammars2XTest extends TestCase {
 		_test(xsd, xml);
 	}
 
+    protected void _roundTripTest(String xsd) throws Exception {
+        grammarBuilder.loadGrammars(xsd);
+        SchemaInformedGrammars grammarsIn = grammarBuilder.toGrammars();
+
+        Grammars2X g2X = new Grammars2X();
+        ExiGrammars exiGrammarIn = g2X.toGrammarsX(grammarsIn);
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		Grammars2X.marshall(exiGrammarIn, baos);
+		String control = baos.toString();
+		System.out.println(control);
+        ExiGrammars exiGrammarOut = Grammars2X.unmarshall(new ByteArrayInputStream(baos.toByteArray()));
+        SchemaInformedGrammars grammarsOut = Grammars2X.toGrammars(exiGrammarOut);
+        g2X.clear();
+        ExiGrammars exiGrammarRoundTrip = g2X.toGrammarsX(grammarsOut);
+        ByteArrayOutputStream baosRoundTrip = new ByteArrayOutputStream();
+        Grammars2X.marshall(exiGrammarRoundTrip, baosRoundTrip);
+        String test = baosRoundTrip.toString();
+        System.out.println(test);
+        assertXMLEqual(control, test);
+    }
+
+    @Test
+    public void testRoundTripNotebook() throws Exception {
+        String xsd = "data/W3C/PrimerNotebook/notebook.xsd";
+        _roundTripTest(xsd);
+    }
 }
