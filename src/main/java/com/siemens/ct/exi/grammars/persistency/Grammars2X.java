@@ -580,19 +580,19 @@ public class Grammars2X {
 			// next state ID
 			{
 				Grammar nextRule = ei.getNextGrammar();
-				if (nextRule.getNumberOfEvents() > 0) {
+				//if (nextRule.getNumberOfEvents() > 0) {
 					long nextGrammarID = gpreps.getGrammarID(nextRule);
 					p.setNextGrammarID(nextGrammarID);
-				} else {
+				//} else {
 					// No events anymore, eg. EE, ED
-				}
+				//}
 
 			}
 		}
 	}
 
 
-	
+
 	private static Datatype getBasicDatatype(com.siemens.ct.exi._2017.schemaforgrammars.Datatype dt, QNameContext qnc) throws EXIException {
 		Datatype datatype;
 		if(dt.getBase64Binary() != null) {
